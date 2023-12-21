@@ -58,12 +58,13 @@ pub struct Population {
     pub size: usize,
     pub crossover_rate: f64,
     pub mutation_rate: f64,
+    pub elitism: bool,
     pub stop_criteria: f64,
     pub individuals: Vec<Box<dyn Individual>>,
 }
 
 impl Population {
-    pub fn new<T: Individual + 'static>(size: usize, crossover_rate: f64, mutation_rate: f64, stop_criteria: f64, dim: usize, individual_creator: fn(usize) -> T) -> Self {
+    pub fn new<T: Individual + 'static>(size: usize, crossover_rate: f64, mutation_rate: f64, elitism: bool, stop_criteria: f64, dim: usize, individual_creator: fn(usize) -> T) -> Self {
         let mut individuals = Vec::new();
         for _ in 0..size {
             individuals.push(Box::new(individual_creator(dim)) as Box<dyn Individual>);
@@ -72,6 +73,7 @@ impl Population {
             size,
             crossover_rate,
             mutation_rate,
+            elitism,
             stop_criteria,
             individuals,
         }
@@ -81,17 +83,5 @@ impl Population {
         for individual in &mut self.individuals {
             individual.initialize(lower_bound, upper_bound);
         }
-    }
-
-    pub fn characteristics(&self) -> String {
-        format!(
-            "Objective function: {}\nDimensions: {}\nPopulation size: {}\nCrossover rate: {}\nMutation rate: {}\nStop criteria: {}",
-            self.individuals[0].objective_function(),
-            self.individuals[0].get_dim(),
-            self.size,
-            self.crossover_rate,
-            self.mutation_rate,
-            self.stop_criteria
-        )
     }
 }
